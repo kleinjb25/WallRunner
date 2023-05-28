@@ -16,7 +16,7 @@ public class CameraController : MonoBehaviour
     public Sprite platformSprite;
     public Material platformMaterial;
     private bool isPlayerLookingAtWhitePixel = false;
-
+    Vector3 player3DPosition;
     void Start()
     {
 
@@ -24,106 +24,79 @@ public class CameraController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked; // lock the cursor to the center of the screen
         texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
     }
-
+    public float gravity;
+    public float groundTime;
+    Vector3 lastPlayerPos;
+    Vector3 lastCamRot;
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
-        float inputX = Input.GetAxis("Mouse X"); // get the mouse X axis
-        float inputY = Input.GetAxis("Mouse Y"); // get the mouse Y axis
-        cameraVerticalRotation -= inputY; // subtract the Y axis input from the camera rotation
-        cameraVerticalRotation = Mathf.Clamp(cameraVerticalRotation, 0f, 0f); // clamp the camera rotation to prevent the player from looking too far up or down
-        if (!is2D)
-        {
-            transform.localEulerAngles = Vector3.right * cameraVerticalRotation; // rotate the camera on the X axis
-            player.Rotate(Vector3.up * inputX); // rotate the player on the Y axis
-        }
-        RectTransform imageRect = imageToSample.GetComponent<RectTransform>();
-
-        // Calculate the UV coordinates of the image on the RenderTexture
-        Rect uvRect = new Rect(imageRect.position.x / Screen.width, imageRect.position.y / Screen.height,
-            imageRect.rect.width / Screen.width, imageRect.rect.height / Screen.height);
-
-        // Calculate the pixel position of the bottom-left corner of the image on the RenderTexture
-        Vector2Int pixelPosition = new Vector2Int((int)(uvRect.x * renderTexture.width), (int)(uvRect.y * renderTexture.height));
-        // Read the pixel data from the RenderTexture into the Texture2D
         RenderTexture.active = renderTexture;
         texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
         texture2D.Apply();
-
-        // Apply the modifications to the RenderTexture
         texture2D.Apply();
-        // Use the sampled pixel color
-        Color pixelColor = texture2D.GetPixel(pixelPosition.x + (int)(imageRect.rect.width / 2), pixelPosition.y + (int)(imageRect.rect.height / 2));
-        //Debug.Log("Pixel Color: " + pixelColor);
-        bool isLookingAtWhitePixel = (pixelColor == Color.white);
 
-        // Enable/disable the image based on the pixel color
-        if (isLookingAtWhitePixel)
+        Vector3 imageSamplePos = imageToSample.GetComponent<RectTransform>().position;
+        if (player3DPosition != new Vector3())
         {
-            Activate2DMechanics();
-            GeneratePlatforms();
-        }
-    }
-
-    private void GeneratePlatforms()
-    {
-        if (!isPlayerLookingAtWhitePixel)
-            return;
-
-        int numPlatforms = Random.Range(1, 6); // Generate between 1 and 5 platforms
-
-        for (int i = 0; i < numPlatforms; i++)
-        {
-            // Generate random X and Y coordinates within the RenderTexture bounds
-            float randomX = Random.Range(0, renderTexture.width);
-            float randomY = Random.Range(0, renderTexture.height);
-
-            // Instantiate the platform at the generated position
-            Vector3 platformPosition = new Vector3(randomX, randomY, 0);
-            GameObject platform = Instantiate(platformPrefab, platformPosition, Quaternion.identity);
-
-            float scaleBoundsX = Random.Range(0.01f, 1);
-            float scaleBoundsY = Random.Range(0.05f, 0.9f);
-            platform.transform.localScale = new Vector3(scaleBoundsX, scaleBoundsY, 1);
-            SpriteRenderer spriteRenderer = platform.GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null)
-        {
-            // Assign a sprite to the platform
-            // Replace "YourSprite" with the actual sprite you want to use
-            spriteRenderer.sprite = platformSprite;
-        }
-        else
-        {
-            Renderer renderer = platform.GetComponent<Renderer>();
-            if (renderer != null)
+            Vector3 oldImageSamplePos = imageSamplePos;
+            imageSamplePos.x = firstPersonCamera.WorldToScreenPoint(player3DPosition).x;
+            imageSamplePos.y = firstPersonCamera.WorldToScreenPoint(player3DPosition).y;
+            if (Vector3.Distance(oldImageSamplePos, imageSamplePos) > 50)
             {
-                // Assign a material to the platform
-                // Replace "YourMaterial" with the actual material you want to use
-                renderer.material = platformMaterial;
+                player.position = lastPlayerPos;
+                firstPersonCamera.transform.eulerAngles = lastCamRot;
+                imageSamplePos = oldImageSamplePos;
             }
+            
         }
+        imageToSample.GetComponent<RectTransform>().position = imageSamplePos;
+        gravity -= Physics.gravity.y * Time.deltaTime;
+        imageToSample.GetComponent<RectTransform>().position += Vector3.down*gravity;
+        imageToSample.GetComponent<RectTransform>().position += Vector3.right * Input.GetAxis("Horizontal") *300*Time.deltaTime;
+        while (checkCollision(Left))
+            imageToSample.GetComponent<RectTransform>().position += Vector3.right;
+        while (checkCollision(Right))
+            imageToSample.GetComponent<RectTransform>().position += Vector3.left;
+        while (checkCollision(Up))
+            imageToSample.GetComponent<RectTransform>().position += Vector3.down;
+        while (checkCollision(Down))
+        {
+            imageToSample.GetComponent<RectTransform>().position += Vector3.up;
+            gravity = 0;
+            groundTime = Time.realtimeSinceStartup + 0.1f;
         }
-
+        if (Time.realtimeSinceStartup < groundTime && Input.GetKey(KeyCode.Space))
+        {
+            gravity = -3;
+        }
+        
+        RaycastHit hit;
+        Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
+        player3DPosition = firstPersonCamera.ScreenToWorldPoint(new Vector3(imageToSample.GetComponent<RectTransform>().position.x, imageToSample.GetComponent<RectTransform>().position.y, hit.distance));
+        lastPlayerPos = player.position;
+        lastCamRot = firstPersonCamera.transform.eulerAngles;
+        player.transform.LookAt(firstPersonCamera.ScreenToWorldPoint(new Vector3(imageToSample.GetComponent<RectTransform>().position.x, imageToSample.GetComponent<RectTransform>().position.y, 1)));
+        Vector3 eulerAngles = player.transform.eulerAngles;
+        eulerAngles.x = 0;
+        eulerAngles.z = 0;
+        player.transform.eulerAngles = eulerAngles;
         
     }
+    public bool checkCollision(GameObject check)
+    {
+        RectTransform imageRect = check.GetComponent<RectTransform>();
+        Rect uvRect = new Rect(imageRect.position.x / Screen.width, imageRect.position.y / Screen.height,
+        imageRect.rect.width / Screen.width, imageRect.rect.height / Screen.height);
+        Vector2Int pixelPosition = new Vector2Int((int)(uvRect.x * renderTexture.width), (int)(uvRect.y * renderTexture.height));
+        
+        Color pixelColor = texture2D.GetPixel(pixelPosition.x + (int)(imageRect.rect.width / 2), pixelPosition.y + (int)(imageRect.rect.height / 2));
+        return (pixelColor == Color.white);
+    }
+    public GameObject Right;
+    public GameObject Left;
+    public GameObject Up;
+    public GameObject Down;
+    
 
-    private void Activate2DMechanics()
-    {
-        imageToSample.gameObject.SetActive(true);
-        platformPrefab.SetActive(true);
-        is2D = true;
-        isPlayerLookingAtWhitePixel = true;
-    }
-
-    private void Deactivate2DMechanics()
-    {
-        // Add your code here to deactivate the 2D mechanics
-        Debug.Log("2D mechanics deactivated!");
-    }
-    private void OnDestroy()
-    {
-        // Release the temporary Texture2D
-        if (texture2D != null)
-            Destroy(texture2D);
-    }
 }
