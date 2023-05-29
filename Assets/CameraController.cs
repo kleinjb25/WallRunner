@@ -25,6 +25,11 @@ public class CameraController : MonoBehaviour
     public GameObject youWin;
     public GameObject youLose;
     public GameObject whatToDo;
+    public AudioSource audioSource;
+    public AudioClip success;
+    public AudioClip die;
+    public AudioClip jump;
+    private bool gameEnded = false;
     void Start()
     {
         Time.timeScale = 1f;
@@ -38,25 +43,35 @@ public class CameraController : MonoBehaviour
     
     void Update()
     {
-        
-        if (checkCollision(Left).Equals(Color.green) || checkCollision(Right).Equals(Color.green) || checkCollision(Up).Equals(Color.green) || checkCollision(Down).Equals(Color.green))
+
+        if (!gameEnded)
         {
-            Time.timeScale = 0f;
-            whiteBackground.enabled = true;
-            youWin.SetActive(true);
-            whatToDo.SetActive(true);
-        }
-        if (imageToSample.transform.position.y < 0)
-        {
-            Time.timeScale = 0f;
-            whiteBackground.enabled = true;
-            youLose.SetActive(true);
-            whatToDo.SetActive(true);
+            if (checkCollision(Left).Equals(Color.green) || checkCollision(Right).Equals(Color.green) || checkCollision(Up).Equals(Color.green) || checkCollision(Down).Equals(Color.green))
+            {
+                gameEnded = true; // Set the game end state to true
+                audioSource.PlayOneShot(success);
+                Time.timeScale = 0f;
+                whiteBackground.enabled = true;
+                youWin.SetActive(true);
+                whatToDo.SetActive(true);
+            }
+            if (imageToSample.transform.position.y < 0)
+            {
+                gameEnded = true; // Set the game end state to true
+                audioSource.PlayOneShot(die);
+                Time.timeScale = 0f;
+                whiteBackground.enabled = true;
+                youLose.SetActive(true);
+                whatToDo.SetActive(true);
+            }
         }
     }
     // Update is called once per frame
     void LateUpdate()
     {
+        
+                
+        
         RenderTexture.active = renderTexture;
         texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
         texture2D.Apply();
@@ -92,10 +107,9 @@ public class CameraController : MonoBehaviour
             gravity = 0;
             groundTime = Time.realtimeSinceStartup + 0.1f;
         }
-        if (Time.realtimeSinceStartup < groundTime && Input.GetKey(KeyCode.Space))
+        if (Time.realtimeSinceStartup < groundTime && Input.GetKeyDown(KeyCode.Space))
         {
-            //play sound
-
+            audioSource.PlayOneShot(jump);
             gravity = -3;
         }
         
