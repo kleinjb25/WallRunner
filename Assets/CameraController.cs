@@ -2,32 +2,58 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour
 {
     public Transform player;
-    float cameraVerticalRotation = 0f;
     public Camera firstPersonCamera;
     public RenderTexture renderTexture;
     public Image imageToSample;
     private Texture2D texture2D;
-    public static bool is2D = false;
-    public GameObject platformPrefab;
-    public Sprite platformSprite;
-    public Material platformMaterial;
-    private bool isPlayerLookingAtWhitePixel = false;
     Vector3 player3DPosition;
-    void Start()
-    {
-
-        Cursor.visible = false; // hide the cursor
-        Cursor.lockState = CursorLockMode.Locked; // lock the cursor to the center of the screen
-        texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
-    }
+    public GameObject Right;
+    public GameObject Left;
+    public GameObject Up;
+    public GameObject Down;
     public float gravity;
     public float groundTime;
     Vector3 lastPlayerPos;
     Vector3 lastCamRot;
+
+    public Image whiteBackground; //end of the game, either when u die or win
+    public GameObject youWin;
+    public GameObject youLose;
+    public GameObject whatToDo;
+    void Start()
+    {
+        Time.timeScale = 1f;
+        whiteBackground.enabled = false;
+        youWin.SetActive(false);
+        whatToDo.SetActive(false);
+        Cursor.visible = false; // hide the cursor
+        Cursor.lockState = CursorLockMode.Locked; // lock the cursor to the center of the screen
+        texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
+    }
+    
+    void Update()
+    {
+        
+        if (checkCollision(Left).Equals(Color.green) || checkCollision(Right).Equals(Color.green) || checkCollision(Up).Equals(Color.green) || checkCollision(Down).Equals(Color.green))
+        {
+            Time.timeScale = 0f;
+            whiteBackground.enabled = true;
+            youWin.SetActive(true);
+            whatToDo.SetActive(true);
+        }
+        if (imageToSample.transform.position.y < 0)
+        {
+            Time.timeScale = 0f;
+            whiteBackground.enabled = true;
+            youLose.SetActive(true);
+            whatToDo.SetActive(true);
+        }
+    }
     // Update is called once per frame
     void LateUpdate()
     {
@@ -54,13 +80,13 @@ public class CameraController : MonoBehaviour
         gravity -= Physics.gravity.y * Time.deltaTime;
         imageToSample.GetComponent<RectTransform>().position += Vector3.down*gravity;
         imageToSample.GetComponent<RectTransform>().position += Vector3.right * Input.GetAxis("Horizontal") *300*Time.deltaTime;
-        while (checkCollision(Left))
+        while (checkCollision(Left).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.right;
-        while (checkCollision(Right))
+        while (checkCollision(Right).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.left;
-        while (checkCollision(Up))
+        while (checkCollision(Up).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.down;
-        while (checkCollision(Down))
+        while (checkCollision(Down).Equals(Color.white))
         {
             imageToSample.GetComponent<RectTransform>().position += Vector3.up;
             gravity = 0;
@@ -68,6 +94,8 @@ public class CameraController : MonoBehaviour
         }
         if (Time.realtimeSinceStartup < groundTime && Input.GetKey(KeyCode.Space))
         {
+            //play sound
+
             gravity = -3;
         }
         
@@ -83,20 +111,17 @@ public class CameraController : MonoBehaviour
         player.transform.eulerAngles = eulerAngles;
         
     }
-    public bool checkCollision(GameObject check)
+    public Color checkCollision(GameObject check)
     {
         RectTransform imageRect = check.GetComponent<RectTransform>();
         Rect uvRect = new Rect(imageRect.position.x / Screen.width, imageRect.position.y / Screen.height,
         imageRect.rect.width / Screen.width, imageRect.rect.height / Screen.height);
         Vector2Int pixelPosition = new Vector2Int((int)(uvRect.x * renderTexture.width), (int)(uvRect.y * renderTexture.height));
         
-        Color pixelColor = texture2D.GetPixel(pixelPosition.x + (int)(imageRect.rect.width / 2), pixelPosition.y + (int)(imageRect.rect.height / 2));
-        return (pixelColor == Color.white);
+        return texture2D.GetPixel(pixelPosition.x + (int)(imageRect.rect.width / 2), pixelPosition.y + (int)(imageRect.rect.height / 2));
+        
     }
-    public GameObject Right;
-    public GameObject Left;
-    public GameObject Up;
-    public GameObject Down;
-    
+
+
 
 }

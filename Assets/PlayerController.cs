@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,18 +10,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (CameraController.is2D)
-        {
-            moveDirection = Vector3.zero;
-        }
-        if (!CameraController.is2D)
-        {
+        if (Input.GetKey(KeyCode.R))
+            SceneManager.LoadScene("DemoScene");
+        if (Input.GetKey(KeyCode.Escape))
+            Application.Quit();
             CharacterController controller = GetComponent<CharacterController>();
             moveDirection = new Vector3(0, 0, Input.GetAxis("Vertical"));
             moveDirection = transform.TransformDirection(moveDirection);
             moveDirection *= speed;
             controller.Move(moveDirection * Time.deltaTime);
-        }
-        
     }
 }
