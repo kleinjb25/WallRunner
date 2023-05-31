@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (Input.GetKey(KeyCode.R))
-            SceneManager.LoadScene("DemoScene");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         if (Input.GetKey(KeyCode.Escape))
             Application.Quit();
             CharacterController controller = GetComponent<CharacterController>();

@@ -20,7 +20,6 @@ public class CameraController : MonoBehaviour
     public float groundTime;
     Vector3 lastPlayerPos;
     Vector3 lastCamRot;
-
     public Image whiteBackground; //end of the game, either when u die or win
     public GameObject youWin;
     public GameObject youLose;
@@ -30,6 +29,11 @@ public class CameraController : MonoBehaviour
     public AudioClip die;
     public AudioClip jump;
     private bool gameEnded = false;
+    public GameObject music;
+    void Awake()
+    {
+        texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
+    }
     void Start()
     {
         Time.timeScale = 1f;
@@ -38,7 +42,7 @@ public class CameraController : MonoBehaviour
         whatToDo.SetActive(false);
         Cursor.visible = false; // hide the cursor
         Cursor.lockState = CursorLockMode.Locked; // lock the cursor to the center of the screen
-        texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
+        
     }
     
     void Update()
@@ -48,16 +52,31 @@ public class CameraController : MonoBehaviour
         {
             if (checkCollision(Left).Equals(Color.green) || checkCollision(Right).Equals(Color.green) || checkCollision(Up).Equals(Color.green) || checkCollision(Down).Equals(Color.green))
             {
-                gameEnded = true; // Set the game end state to true
+                //uncomment for full game development, also when testing, need to make it so success audioclip actually plays when changing scenes
+                /*try { 
+                    
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); 
+                    
+                }
+                catch {
+                    audioSource.PlayOneShot(success);
+                    gameEnded = true;
+                    Time.timeScale = 0f;
+                    whiteBackground.enabled = true;
+                    youWin.SetActive(true);
+                    whatToDo.SetActive(true);
+                }*/
                 audioSource.PlayOneShot(success);
+                gameEnded = true;
                 Time.timeScale = 0f;
                 whiteBackground.enabled = true;
                 youWin.SetActive(true);
                 whatToDo.SetActive(true);
+
             }
             if (imageToSample.transform.position.y < 0)
             {
-                gameEnded = true; // Set the game end state to true
+                gameEnded = true;
                 audioSource.PlayOneShot(die);
                 Time.timeScale = 0f;
                 whiteBackground.enabled = true;
@@ -69,9 +88,6 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        
-                
-        
         RenderTexture.active = renderTexture;
         texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
         texture2D.Apply();
