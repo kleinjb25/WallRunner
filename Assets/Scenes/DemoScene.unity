@@ -571,6 +571,7 @@ MonoBehaviour:
   die: {fileID: 8300000, guid: 1d9eb78b490c6d547ad304935dac9370, type: 3}
   jump: {fileID: 8300000, guid: 9431392e8b8400e4ba7cd3f9b40a980d, type: 3}
   music: {fileID: 0}
+  switchCooldownDuration: 2
 --- !u!1 &451197825
 GameObject:
   m_ObjectHideFlags: 0
@@ -1915,7 +1916,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh50456
+  m_Name: pb_Mesh26490
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -25891,7 +25892,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 29a427bbefa22344cbbd4ed1f436fef0, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.699
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -26463,7 +26464,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 29a427bbefa22344cbbd4ed1f436fef0, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 0
