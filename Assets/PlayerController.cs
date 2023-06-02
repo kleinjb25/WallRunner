@@ -11,7 +11,17 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (Input.GetKey(KeyCode.R))
+        {
+            PlayerPrefs.SetInt("once", 0);
+            PlayerPrefs.Save();
+            if (SceneManager.GetActiveScene().buildIndex == 2)
+            {
+                GameObject[] musicObjs = GameObject.FindGameObjectsWithTag("Music");
+                Destroy(musicObjs[0]);
+            }
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+            
         if (Input.GetKey(KeyCode.Escape))
             Application.Quit();
             CharacterController controller = GetComponent<CharacterController>();

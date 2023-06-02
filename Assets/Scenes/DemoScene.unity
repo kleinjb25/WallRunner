@@ -446,6 +446,82 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 174707053}
   m_CullTransparentMesh: 1
+--- !u!1 &227534637
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 227534638}
+  - component: {fileID: 227534640}
+  - component: {fileID: 227534639}
+  m_Layer: 6
+  m_Name: PlayerSprite (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &227534638
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227534637}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1684397867}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0.000061035156, y: 0.00004005432}
+  m_SizeDelta: {x: 25, y: 25}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &227534639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227534637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: f338c358b7ccf0442b2c470c2a08dd58, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &227534640
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227534637}
+  m_CullTransparentMesh: 1
 --- !u!1 &363264195
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,8 +532,8 @@ GameObject:
   m_Component:
   - component: {fileID: 363264198}
   - component: {fileID: 363264197}
-  - component: {fileID: 363264196}
   - component: {fileID: 363264199}
+  - component: {fileID: 363264200}
   m_Layer: 3
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -465,14 +541,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &363264196
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 363264195}
-  m_Enabled: 1
 --- !u!20 &363264197
 Camera:
   m_ObjectHideFlags: 0
@@ -562,6 +630,7 @@ MonoBehaviour:
   Down: {fileID: 1026522165}
   gravity: 0
   groundTime: 0
+  playerSpriteChild: {fileID: 227534637}
   whiteBackground: {fileID: 451197827}
   youWin: {fileID: 174707053}
   youLose: {fileID: 1160607996}
@@ -572,6 +641,14 @@ MonoBehaviour:
   jump: {fileID: 8300000, guid: 9431392e8b8400e4ba7cd3f9b40a980d, type: 3}
   music: {fileID: 0}
   switchCooldownDuration: 2
+--- !u!81 &363264200
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363264195}
+  m_Enabled: 1
 --- !u!1 &451197825
 GameObject:
   m_ObjectHideFlags: 0
@@ -25225,6 +25302,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 227534638}
   - {fileID: 172401335}
   - {fileID: 1976508278}
   - {fileID: 1026522166}
@@ -26431,7 +26509,7 @@ GameObject:
   - component: {fileID: 2026489291}
   - component: {fileID: 2026489290}
   m_Layer: 0
-  m_Name: Music
+  m_Name: test
   m_TagString: Music
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26538,7 +26616,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 1.1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

@@ -20,6 +20,7 @@ public class CameraController : MonoBehaviour
     public float groundTime;
     Vector3 lastPlayerPos;
     Vector3 lastCamRot;
+    public GameObject playerSpriteChild;
 
     public Image whiteBackground; //end of the game, either when u die or win
     public GameObject youWin;
@@ -35,9 +36,21 @@ public class CameraController : MonoBehaviour
     private bool canSwitchGravity = true;
     public float switchCooldownDuration = 2f;
     private float switchCooldownTimer;
+    
     void Awake()
     {
+
+        bool loadedBool = PlayerPrefs.GetInt("once", 0) == 1;
+        if (loadedBool)
+        {
+            audioSource.PlayOneShot(success);
+        }
         texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
+
+    }
+    void OnApplicationQuit() {
+        PlayerPrefs.SetInt("once", 0);
+        PlayerPrefs.Save();
     }
     void Start()
     {
@@ -58,27 +71,25 @@ public class CameraController : MonoBehaviour
             if (checkCollision(Left).Equals(Color.green) || checkCollision(Right).Equals(Color.green) || checkCollision(Up).Equals(Color.green) || checkCollision(Down).Equals(Color.green))
             {
                 //uncomment for full game development, also when testing, need to make it so success audioclip actually plays when changing scenes
-                /*try { 
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); 
-                    
+                int sceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+                if (sceneIndex < SceneManager.sceneCountInBuildSettings)
+                {
+                    SceneManager.LoadScene(sceneIndex);
+                    PlayerPrefs.SetInt("once", 1);
+                    PlayerPrefs.Save();
                 }
-                catch {
+                else
+                {
                     audioSource.PlayOneShot(success);
                     gameEnded = true;
                     Time.timeScale = 0f;
                     whiteBackground.enabled = true;
                     youWin.SetActive(true);
                     whatToDo.SetActive(true);
-                }*/
-                audioSource.PlayOneShot(success);
-                gameEnded = true;
-                Time.timeScale = 0f;
-                whiteBackground.enabled = true;
-                youWin.SetActive(true);
-                whatToDo.SetActive(true);
+                }
 
             }
-            if (imageToSample.transform.position.y < 0)
+            if (imageToSample.transform.position.y < 0 || imageToSample.transform.position.y > Screen.height)
             {
                 gameEnded = true;
                 audioSource.PlayOneShot(die);
@@ -114,36 +125,81 @@ public class CameraController : MonoBehaviour
         }
         imageToSample.GetComponent<RectTransform>().position = imageSamplePos;
         gravity -= Physics.gravity.y * Time.deltaTime;
-        imageToSample.GetComponent<RectTransform>().position += Vector3.down*gravity;
+        if (!flipped)
+            imageToSample.GetComponent<RectTransform>().position += Vector3.down*gravity;
+        else
+            imageToSample.GetComponent<RectTransform>().position -= Vector3.down * gravity;
         imageToSample.GetComponent<RectTransform>().position += Vector3.right * Input.GetAxis("Horizontal") *300*Time.deltaTime;
         while (checkCollision(Left).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.right;
         while (checkCollision(Right).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.left;
-        while (checkCollision(Up).Equals(Color.white))
-           imageToSample.GetComponent<RectTransform>().position += Vector3.down;
-        while (checkCollision(Down).Equals(Color.white))
+        if (flipped)
         {
-            imageToSample.GetComponent<RectTransform>().position += Vector3.up;
-            gravity = 0;
-            groundTime = Time.realtimeSinceStartup + 0.1f;
+            
+            while (checkCollision(Down).Equals(Color.white))
+            {
+                imageToSample.GetComponent<RectTransform>().position += Vector3.up;
+                if (!flipped)
+                {
+                    gravity = 0;
+                    groundTime = Time.realtimeSinceStartup + 0.1f;
+                }
+            
+            }
+            while (checkCollision(Up).Equals(Color.white))
+            {
+                imageToSample.GetComponent<RectTransform>().position += Vector3.down;
+                if (flipped)
+                {
+                    gravity = 0;
+                    groundTime = Time.realtimeSinceStartup + 0.1f;
+                }
+            }
+            
+        } else
+        {
+            while (checkCollision(Up).Equals(Color.white))
+            {
+                imageToSample.GetComponent<RectTransform>().position += Vector3.down;
+                if (flipped)
+                {
+                    gravity = 0;
+                    groundTime = Time.realtimeSinceStartup + 0.1f;
+                }
+            }
+            while (checkCollision(Down).Equals(Color.white))
+            {
+                imageToSample.GetComponent<RectTransform>().position += Vector3.up;
+                if (!flipped)
+                {
+                    gravity = 0;
+                    groundTime = Time.realtimeSinceStartup + 0.1f;
+                }
+
+            }
         }
+        
         if (Time.realtimeSinceStartup < groundTime && Input.GetKeyDown(KeyCode.Space))
         {
             audioSource.PlayOneShot(jump);
             gravity = -3;
         }
         //logic for switching gravity with a short cooldown, need to figure out gravity part
-        /*if (Input.GetKey(KeyCode.LeftControl) && canSwitchGravity)
+        if (Input.GetKeyDown(KeyCode.LeftControl) && canSwitchGravity)
         {
-                if (imageToSample.GetComponent<RectTransform>().localScale.y == -1f)
-                    imageToSample.GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
-                else
-                    imageToSample.GetComponent<RectTransform>().localScale = new Vector3(1f, -1f, 1f);
-                gravity = -1;
-                switchCooldownTimer = switchCooldownDuration;
-                canSwitchGravity = false;
-                flipped = !flipped;
+            switchCooldownTimer = switchCooldownDuration;
+            canSwitchGravity = false;
+            flipped = !flipped;
+            audioSource.PlayOneShot(jump);
+        }
+        if (flipped)
+        {
+            playerSpriteChild.transform.localScale = new Vector3(1,-1,1);
+        }
+        else if (!flipped)
+        {
+            playerSpriteChild.transform.localScale = new Vector3(1, 1, 1);
         }
         if (!canSwitchGravity)
         {
@@ -155,7 +211,7 @@ public class CameraController : MonoBehaviour
                 // Enable gravity switch after cooldown is over
                 canSwitchGravity = true;
             }
-        }*/
+        }
         RaycastHit hit;
         Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
         player3DPosition = firstPersonCamera.ScreenToWorldPoint(new Vector3(imageToSample.GetComponent<RectTransform>().position.x, imageToSample.GetComponent<RectTransform>().position.y, hit.distance));
