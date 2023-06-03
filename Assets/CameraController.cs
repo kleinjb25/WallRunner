@@ -36,6 +36,7 @@ public class CameraController : MonoBehaviour
     private bool canSwitchGravity = true;
     public float switchCooldownDuration = 2f;
     private float switchCooldownTimer;
+    private bool dead = false;
     
     void Awake()
     {
@@ -70,7 +71,6 @@ public class CameraController : MonoBehaviour
         {
             if (checkCollision(Left).Equals(Color.green) || checkCollision(Right).Equals(Color.green) || checkCollision(Up).Equals(Color.green) || checkCollision(Down).Equals(Color.green))
             {
-                //uncomment for full game development, also when testing, need to make it so success audioclip actually plays when changing scenes
                 int sceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
                 if (sceneIndex < SceneManager.sceneCountInBuildSettings)
                 {
@@ -87,9 +87,8 @@ public class CameraController : MonoBehaviour
                     youWin.SetActive(true);
                     whatToDo.SetActive(true);
                 }
-
             }
-            if (imageToSample.transform.position.y < 0 || imageToSample.transform.position.y > Screen.height)
+            if (imageToSample.transform.position.y < 0 || imageToSample.transform.position.y > Screen.height || dead)
             {
                 gameEnded = true;
                 audioSource.PlayOneShot(die);
@@ -98,12 +97,17 @@ public class CameraController : MonoBehaviour
                 youLose.SetActive(true);
                 whatToDo.SetActive(true);
             }
+            //need to figure out how to make it work for a different texture
+            //Color test = new Color(.608f, .255f, .188f, 1);
+            if (checkCollision(Left).Equals(Color.red) || checkCollision(Right).Equals(Color.red) || checkCollision(Up).Equals(Color.red) || checkCollision(Down).Equals(Color.red))
+            {
+                dead = true;
+            }
         }
     }
     // Update is called once per frame
     void LateUpdate()
     {
-        //Debug.Log("Gravity: " + gravity + " GroundTime: " + groundTime);
         RenderTexture.active = renderTexture;
         texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
         texture2D.Apply();
@@ -129,7 +133,7 @@ public class CameraController : MonoBehaviour
             imageToSample.GetComponent<RectTransform>().position += Vector3.down*gravity;
         else
             imageToSample.GetComponent<RectTransform>().position -= Vector3.down * gravity;
-        imageToSample.GetComponent<RectTransform>().position += Vector3.right * Input.GetAxis("Horizontal") *300*Time.deltaTime;
+        imageToSample.GetComponent<RectTransform>().position += Vector3.right * Input.GetAxis("Horizontal") *500*Time.deltaTime;
         while (checkCollision(Left).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.right;
         while (checkCollision(Right).Equals(Color.white))
@@ -185,7 +189,7 @@ public class CameraController : MonoBehaviour
             audioSource.PlayOneShot(jump);
             gravity = -3;
         }
-        //logic for switching gravity with a short cooldown, need to figure out gravity part
+        //logic for switching gravity with a short cooldown
         if (Input.GetKeyDown(KeyCode.LeftControl) && canSwitchGravity)
         {
             switchCooldownTimer = switchCooldownDuration;
@@ -230,11 +234,7 @@ public class CameraController : MonoBehaviour
         Rect uvRect = new Rect(imageRect.position.x / Screen.width, imageRect.position.y / Screen.height,
         imageRect.rect.width / Screen.width, imageRect.rect.height / Screen.height);
         Vector2Int pixelPosition = new Vector2Int((int)(uvRect.x * renderTexture.width), (int)(uvRect.y * renderTexture.height));
-        
         return texture2D.GetPixel(pixelPosition.x + (int)(imageRect.rect.width / 2), pixelPosition.y + (int)(imageRect.rect.height / 2));
         
     }
-
-
-
 }

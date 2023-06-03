@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 6f;
+    public float speed = 12f;
     private Vector3 moveDirection = Vector3.zero;
     // Update is called once per frame
     void Update()
