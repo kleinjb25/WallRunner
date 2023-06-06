@@ -37,17 +37,15 @@ public class CameraController : MonoBehaviour
     public float switchCooldownDuration = 2f;
     private float switchCooldownTimer;
     private bool dead = false;
-    
     void Awake()
     {
-
+        
         bool loadedBool = PlayerPrefs.GetInt("once", 0) == 1;
         if (loadedBool)
         {
             audioSource.PlayOneShot(success);
         }
         texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
-
     }
     void OnApplicationQuit() {
         PlayerPrefs.SetInt("once", 0);
@@ -61,12 +59,11 @@ public class CameraController : MonoBehaviour
         whatToDo.SetActive(false);
         Cursor.visible = false; // hide the cursor
         Cursor.lockState = CursorLockMode.Locked; // lock the cursor to the center of the screen
-        
     }
     
     void Update()
     {
-
+        
         if (!gameEnded)
         {
             if (checkCollision(Left).Equals(Color.green) || checkCollision(Right).Equals(Color.green) || checkCollision(Up).Equals(Color.green) || checkCollision(Down).Equals(Color.green))
@@ -97,15 +94,13 @@ public class CameraController : MonoBehaviour
                 youLose.SetActive(true);
                 whatToDo.SetActive(true);
             }
-            //need to figure out how to make it work for a different texture
-            //Color test = new Color(.608f, .255f, .188f, 1);
             if (checkCollision(Left).Equals(Color.red) || checkCollision(Right).Equals(Color.red) || checkCollision(Up).Equals(Color.red) || checkCollision(Down).Equals(Color.red))
             {
                 dead = true;
             }
         }
+        
     }
-    // Update is called once per frame
     void LateUpdate()
     {
         RenderTexture.active = renderTexture;
@@ -133,14 +128,16 @@ public class CameraController : MonoBehaviour
             imageToSample.GetComponent<RectTransform>().position += Vector3.down*gravity;
         else
             imageToSample.GetComponent<RectTransform>().position -= Vector3.down * gravity;
-        imageToSample.GetComponent<RectTransform>().position += Vector3.right * Input.GetAxis("Horizontal") *500*Time.deltaTime;
+        if (Input.GetKey(KeyCode.E))
+        imageToSample.GetComponent<RectTransform>().position += Vector3.right * 500 * Time.deltaTime;
+        else if (Input.GetKey(KeyCode.Q))
+        imageToSample.GetComponent<RectTransform>().position += Vector3.left * 500 * Time.deltaTime;
         while (checkCollision(Left).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.right;
         while (checkCollision(Right).Equals(Color.white))
             imageToSample.GetComponent<RectTransform>().position += Vector3.left;
         if (flipped)
         {
-            
             while (checkCollision(Down).Equals(Color.white))
             {
                 imageToSample.GetComponent<RectTransform>().position += Vector3.up;
@@ -149,7 +146,6 @@ public class CameraController : MonoBehaviour
                     gravity = 0;
                     groundTime = Time.realtimeSinceStartup + 0.1f;
                 }
-            
             }
             while (checkCollision(Up).Equals(Color.white))
             {
@@ -160,7 +156,6 @@ public class CameraController : MonoBehaviour
                     groundTime = Time.realtimeSinceStartup + 0.1f;
                 }
             }
-            
         } else
         {
             while (checkCollision(Up).Equals(Color.white))
@@ -183,7 +178,6 @@ public class CameraController : MonoBehaviour
 
             }
         }
-        
         if (Time.realtimeSinceStartup < groundTime && Input.GetKeyDown(KeyCode.Space))
         {
             audioSource.PlayOneShot(jump);

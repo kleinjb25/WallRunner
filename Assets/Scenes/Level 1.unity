@@ -1336,7 +1336,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Press R to restart or ESC to quit.
+  m_Text: Press Enter to restart, M to go to the main menu, or ESC to quit.
 --- !u!222 &682022896
 CanvasRenderer:
   m_ObjectHideFlags: 0

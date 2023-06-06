@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.R))
+        if (Input.GetKey(KeyCode.Return))
         {
             PlayerPrefs.SetInt("once", 0);
             PlayerPrefs.Save();
@@ -24,8 +24,18 @@ public class PlayerController : MonoBehaviour
             
         if (Input.GetKey(KeyCode.Escape))
             Application.Quit();
+        if (Input.GetKey(KeyCode.M))
+        {
+            PlayerPrefs.SetInt("once", 0);
+            PlayerPrefs.Save();
+            GameObject[] musicObjs = GameObject.FindGameObjectsWithTag("Music");
+            Destroy(musicObjs[0]);
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            SceneManager.LoadScene("MainMenu");
+        }
             CharacterController controller = GetComponent<CharacterController>();
-            moveDirection = new Vector3(0, 0, Input.GetAxis("Vertical"));
+            moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             moveDirection = transform.TransformDirection(moveDirection);
             moveDirection *= speed;
             controller.Move(moveDirection * Time.deltaTime);

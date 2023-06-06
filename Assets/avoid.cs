@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class avoid : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public GameObject avoidText;
+    // objects that need to be destroyed
+    public GameObject destroy1;
+    public GameObject destroy2;
     void Start()
     {
         StartCoroutine(dont());
@@ -13,7 +14,8 @@ public class avoid : MonoBehaviour
 
     IEnumerator dont()
     {
-        yield return new WaitForSeconds(1.5f);
-        Destroy(avoidText);
+        yield return new WaitForSeconds(2.25f);
+        Destroy(destroy1);
+        Destroy(destroy2);
     }
 }

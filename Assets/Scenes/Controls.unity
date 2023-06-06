@@ -358,10 +358,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Guide the 2D creature to the green pellet to win, and make sure it doesn't
-    fall off the white platforms. Use A and D to look left and right, W and S to
-    walk forwards and backwards, and space to make the 2D creature jump. Use R to
-    restart, and ESC to quit.
+  m_Text: Guide the 2D creature to the green area to win, and make sure it doesn't
+    fall off the white platforms. Use Q and E to move the 2D creature left and right,
+    space to make the 2D creature jump, and WASD to make the 3D character strafe.
+    Use Enter to restart, M to go to the main menu, or ESC to quit.
 --- !u!222 &425493936
 CanvasRenderer:
   m_ObjectHideFlags: 0
